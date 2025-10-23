@@ -98,3 +98,16 @@ class HeadwaterServerError(BaseModel):
             self.context = {}
         self.context[key] = value
         return self
+
+
+class HeadwaterServerException(Exception):
+    """Client-side exception wrapping SiphonServerError"""
+
+    def __init__(self, server_error: HeadwaterServerError):
+        self.server_error: HeadwaterServerError = server_error
+        super().__init__(server_error.message)
+
+    def __str__(self):
+        return (
+            f"SiphonServer {self.server_error.error_type}: {self.server_error.message}"
+        )

@@ -10,7 +10,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "dbclients",
-    "pydantic>=2.12.3"
+    "pydantic>=2.12.3",
+    "siphon"
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -23,3 +24,4 @@ include = ["src/headwater-api/py.typed"]
 # ── uv sources (local/editable deps) ───────────────────────────────────────────
 [tool.uv.sources]
 dbclients = { path = "../dbclients-project", editable = true }
+siphon = { path = "../siphon-project", editable = true }
