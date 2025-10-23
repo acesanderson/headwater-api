@@ -19,6 +19,7 @@ from headwater_api.classes.conduit_classes.responses import (
 )
 from headwater_api.classes.curator_classes.responses import (
     CuratorResponse,
+    CuratorResult,
 )
 from headwater_api.classes.siphon_classes.responses import (
     SyntheticData,
@@ -28,6 +29,7 @@ from headwater_api.classes.siphon_classes.responses import (
 from headwater_api.classes.server_classes.exceptions import (
     HeadwaterServerError,
     HeadwaterServerException,
+    ErrorType,
 )
 from headwater_api.classes.server_classes.status import StatusResponse
 
@@ -44,8 +46,10 @@ __all__ = [
     "EmbeddingsResponse",
     "SyntheticData",
     "CuratorResponse",
+    "CuratorResult",
     # Server
     "HeadwaterServerError",
     "HeadwaterServerException",
+    "ErrorType",
     "StatusResponse",
 ]
