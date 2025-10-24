@@ -9,8 +9,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "conduit",
     "dbclients",
     "pydantic>=2.12.3",
+    "pytest",
     "siphon"
 ]
 
@@ -25,3 +27,4 @@ include = ["src/headwater_api/py.typed"]
 [tool.uv.sources]
 dbclients = { path = "../dbclients-project", editable = true }
 siphon = { path = "../siphon-project", editable = true }
+conduit = { path = "../conduit-project", editable = true }

@@ -127,6 +127,8 @@ class HeadwaterTransport:
 
         Returns:
             bool: True if the server responds with 'pong', False otherwise.
+
+        This doesn't use ._request() because we want to handle timeouts and connection errors.
         """
         endpoint = "/ping"  # Or just "ping" if base_url ends with /
         full_url = urljoin(self.base_url, endpoint.lstrip("/"))
@@ -175,7 +177,15 @@ class HeadwaterTransport:
         """
         Get server status + configuration.
         """
-        response = requests.get(f"{self.base_url}/status")
+        method = "GET"
+        endpoints = "/status"
+        json_payload = None
+        response = self._session.request(
+            method=method,
+            url=urljoin(self.base_url, endpoints.lstrip("/")),
+            headers={},
+            data=None,
+        )
         response.raise_for_status()
         status_response = StatusResponse(**response.json())
         return status_response
