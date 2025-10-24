@@ -89,29 +89,29 @@ class HeadwaterClient:
         response.raise_for_status()
         return response.json()
 
-    # def query_sync(self, request: ConduitRequest) -> ConduitResponse | ConduitError:
-    #     """Send a synchronous query to the server"""
-    #     response = requests.post(
-    #         f"{self.base_url}/conduit/sync", json=request.model_dump()
-    #     )
-    #     response.raise_for_status()
-    #     try:
-    #         return ConduitResponse.model_validate_json(response.text)
-    #     except Exception as e:
-    #         return ConduitError.model_validate_json(response.text)
+    def query_sync(self, request: ConduitRequest) -> ConduitResponse | ConduitError:
+        """Send a synchronous query to the server"""
+        response = requests.post(
+            f"{self.base_url}/conduit/sync", json=request.model_dump()
+        )
+        response.raise_for_status()
+        try:
+            return ConduitResponse.model_validate_json(response.text)
+        except Exception as e:
+            return ConduitError.model_validate_json(response.text)
 
-    # def query_async(self, batch: BatchRequest) -> list[ConduitResponse | ConduitError]:
-    #     """Send an asynchronous batch query to the server"""
-    #     response = requests.post(
-    #         f"{self.base_url}/conduit/async", json=batch.model_dump()
-    #     )
-    #     response.raise_for_status()
-    #     try:
-    #         return [
-    #             ConduitResponse.model_validate_json(item) for item in response.json()
-    #         ]
-    #     except Exception as e:
-    #         return [ConduitError.model_validate_json(item) for item in response.json()]
+    def query_async(self, batch: BatchRequest) -> list[ConduitResponse | ConduitError]:
+        """Send an asynchronous batch query to the server"""
+        response = requests.post(
+            f"{self.base_url}/conduit/async", json=batch.model_dump()
+        )
+        response.raise_for_status()
+        try:
+            return [
+                ConduitResponse.model_validate_json(item) for item in response.json()
+            ]
+        except Exception as e:
+            return [ConduitError.model_validate_json(item) for item in response.json()]
 
     # def generate_synthetic_data(
     #     self, request: SyntheticDataRequest
@@ -190,23 +190,23 @@ class HeadwaterClient:
     #         logger.error(f"Error type: {type(e).__name__}")
     #         raise
 
-    # def generate_embeddings(
-    #     self,
-    #     request: EmbeddingsRequest,
-    # ) -> EmbeddingsResponse | ConduitError:
-    #     """
-    #     Generate embeddings using the server.
-    #     """
-    #     response = requests.post(
-    #         f"{self.base_url}/conduit/embeddings",
-    #         json=request.model_dump(),
-    #     )
-    #     response.raise_for_status()
-    #     try:
-    #         return EmbeddingsResponse.model_validate_json(response.text)
-    #
-    #     except Exception as e:
-    #         return ConduitError.model_validate_json(response.text)
+    def generate_embeddings(
+        self,
+        request: EmbeddingsRequest,
+    ) -> EmbeddingsResponse | ConduitError:
+        """
+        Generate embeddings using the server.
+        """
+        response = requests.post(
+            f"{self.base_url}/conduit/embeddings",
+            json=request.model_dump(),
+        )
+        response.raise_for_status()
+        try:
+            return EmbeddingsResponse.model_validate_json(response.text)
+
+        except Exception as e:
+            return ConduitError.model_validate_json(response.text)
 
     def curate(self, request: CuratorRequest) -> CuratorResponse:
         """

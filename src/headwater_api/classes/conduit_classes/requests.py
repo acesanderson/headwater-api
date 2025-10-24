@@ -1,52 +1,6 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Any, Annotated, Literal
-
-
-class ConduitRequest(BaseModel):
-    """
-    Parameters that are constructed by Model and are sent to Clients.
-    This is the dumb version of Conduit's Request object, without any logic.
-    """
-
-    # Core parameters
-    output_type: Literal["text", "image", "audio"] = Field(
-        default="text", description="Desired output: 'text', 'image', 'audio'"
-    )
-    model: str = Field(..., description="The model identifier to use for inference.")
-    messages: BaseModel | list[BaseModel] = Field(
-        default_factory=list,
-        description="List of messages to send to the model. Can include text, images, audio, etc.",
-    )
-
-    # Optional parameters
-    temperature: float | None = Field(
-        default=None,
-        description="Temperature for sampling. If None, defaults to provider-specific value.",
-    )
-    stream: bool = False
-    verbose: Annotated[int, Field(ge=0, le=5)] = Field(
-        default=0,
-        exclude=True,
-        description="Verbosity level for logging and progress display.",
-    )
-    response_model: type[BaseModel] | dict | None = Field(
-        default=None,
-        description="Pydantic model to convert messages to a specific format. If dict, this is a schema for the model for serialization / caching purposes.",
-    )
-    max_tokens: int | None = Field(
-        default=None,
-        description="Maximum number of tokens to generate. If None, it is not passed to the client (except for Anthropic, which requires it and has a default).",
-    )
-    # Post model init parameters
-    provider: str | None = Field(
-        default=None,
-        description="Provider of the model, populated post init. Not intended for direct use.",
-    )
-    # Client parameters (embedded in dict for now)
-    client_params: dict | None = Field(
-        default=None,
-        description="Client-specific parameters. Validated against the provider-approved params, through our ClientParams.",
-    )
+from conduit.request.request import Request as ConduitRequest
+from typing import Any, override
 
 
 class BatchRequest(ConduitRequest):
@@ -66,6 +20,32 @@ class BatchRequest(ConduitRequest):
     prompt_str: str | None = Field(
         default=None, description="Single prompt string for the request."
     )
+
+    # Override model_post_init to allow empty messages
+    @override
+    def model_post_init(self, __context) -> None:
+        """
+        Post-initialization method to validate and set parameters,
+        specifically allowing the 'messages' list to be empty for batch requests.
+        """
+        # --- Copied from Request.model_post_init ---
+        self._validate_model()  # Still need to validate the model exists
+        self._set_provider()  # Still need to determine the provider
+        self._validate_temperature()  # Still need to validate temperature
+        self._set_client_params()  # Still need to validate client_params
+
+        # --- OMITTED the check for empty messages ---
+        # if self.messages is None or len(self.messages) == 0:
+        #     raise ValueError("Messages cannot be empty. Likely a code error.")
+
+        # Still validate that the provider was set correctly
+        if self.provider == "" or self.provider is None:
+            raise ValueError(
+                "Provider must be set based on the model. Likely a code error."
+            )
+        # --- End of copied/modified logic ---
+
+        # The existing _exactly_one validator will still run afterwards
 
     @model_validator(mode="after")
     def _exactly_one(

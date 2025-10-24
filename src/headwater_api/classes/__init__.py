@@ -3,6 +3,7 @@ from headwater_api.classes.conduit_classes.requests import (
     ConduitRequest,
     BatchRequest,
     EmbeddingsRequest,
+    ChromaBatch,
 )
 from headwater_api.classes.siphon_classes.requests import (
     SyntheticDataRequest,
@@ -14,6 +15,7 @@ from headwater_api.classes.curator_classes.requests import (
 # Responses
 from headwater_api.classes.conduit_classes.responses import (
     ConduitResponse,
+    BatchResponse,
     ConduitError,
     EmbeddingsResponse,
 )
@@ -31,17 +33,19 @@ from headwater_api.classes.server_classes.exceptions import (
     HeadwaterServerException,
     ErrorType,
 )
-from headwater_api.classes.server_classes.status import StatusResponse
+from headwater_api.classes.server_classes.status import StatusResponse, PingResponse
 
 __all__ = [
     # Requests
     "ConduitRequest",
     "BatchRequest",
+    "ChromaBatch",
     "EmbeddingsRequest",
     "SyntheticDataRequest",
     "CuratorRequest",
     # Responses
     "ConduitResponse",
+    "BatchResponse",
     "ConduitError",
     "EmbeddingsResponse",
     "SyntheticData",
@@ -52,4 +56,5 @@ __all__ = [
     "HeadwaterServerException",
     "ErrorType",
     "StatusResponse",
+    "PingResponse",
 ]
