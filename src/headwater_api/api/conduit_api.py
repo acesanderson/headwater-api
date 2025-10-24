@@ -4,6 +4,7 @@ ConduitAPI is defined, as a mixin.
 We define ConduitClient at the bottom of the file, combining API with HeadwaterTransport.
 """
 
+from headwater_api.api.base_api import BaseAPI
 from headwater_api.classes import (
     ConduitRequest,
     ConduitResponse,
@@ -11,10 +12,9 @@ from headwater_api.classes import (
     BatchResponse,
     ConduitError,
 )
-from headwater_api.transport.headwater_transport import HeadwaterTransport
 
 
-class ConduitAPI:
+class ConduitAPI(BaseAPI):
     def query_sync(self, request: ConduitRequest) -> ConduitResponse | ConduitError:
         """Send a synchronous query to the server"""
         method = "POST"
@@ -38,7 +38,3 @@ class ConduitAPI:
         json_payload = batch.model_dump_json()
         response = self._request(method, endpoint, json_payload=json_payload)
         return BatchResponse.model_validate_json(response)
-
-
-class ConduitClient(HeadwaterTransport, ConduitAPI):
-    pass

@@ -1,4 +1,4 @@
-from headwater_api.clients.conduit_client import ConduitClient
+from headwater_api.client.headwater_client import HeadwaterClient
 from headwater_api.classes import (
     ConduitRequest,
     ConduitResponse,
@@ -13,8 +13,8 @@ def test_conduit_sync_client():
     message = TextMessage(role="user", content="name three birds")
     messages = [message]
     request = ConduitRequest(messages=messages, model="gpt-oss:latest")
-    client = ConduitClient()
-    response = client.query_sync(request=request)
+    client = HeadwaterClient()
+    response = client.conduit.query_sync(request=request)
     assert isinstance(response, ConduitResponse)
     assert len(str(response.content)) > 0
     print(str(response.content))
@@ -32,8 +32,8 @@ def test_conduit_async_service_prompt_strings():
     )
 
     # Call the conduit_async_service with the batch request
-    client = ConduitClient()
-    response = client.query_async(batch_request)
+    client = HeadwaterClient()
+    response = client.conduit.query_async(batch_request)
 
     # Assert that the response is as expected
     assert isinstance(response, BatchResponse)
@@ -57,8 +57,8 @@ def test_conduit_async_service_input_variables():
     )
 
     # Call the conduit_async_service with the batch request
-    client = ConduitClient()
-    response = client.query_async(batch_request)
+    client = HeadwaterClient()
+    response = client.conduit.query_async(batch_request)
 
     # Assert that the response is as expected
     assert isinstance(response, BatchResponse)

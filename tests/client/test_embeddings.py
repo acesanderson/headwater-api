@@ -1,4 +1,4 @@
-from headwater_api.clients.embeddings_client import EmbeddingsClient
+from headwater_api.client.headwater_client import HeadwaterClient
 from headwater_api.classes import EmbeddingsRequest, ChromaBatch
 
 
@@ -10,6 +10,6 @@ def test_embeddings():
         metadatas=[{}, {}],
     )
     request = EmbeddingsRequest(model=model, batch=batch)
-    ec = EmbeddingsClient()
-    response = ec.generate_embeddings(request)
+    ec = HeadwaterClient()
+    response = ec.embeddings.generate_embeddings(request)
     print(response.model_dump_json(indent=2))
