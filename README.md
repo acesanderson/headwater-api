@@ -1,224 +1,211 @@
-# Headwater API Python Client
+# Headwater API Client
 
-A Python client for interacting with the Headwater API, providing methods for model inference, data synthesis, embeddings generation, and content curation.
+A Python client library for interacting with the Headwater AI services, including LLM querying, text embeddings, and content curation.
 
 ## Quick Start
 
-This guide assumes you have access to a running Headwater API server instance.
+Install the library and run a synchronous query in under a minute. This example sends a single request to the Conduit LLM service and prints the response.
 
-**1. Install Dependencies**
+**1. Install the client**
 
-This client requires the `requests` and `pydantic` libraries.
-
-```bash
-pip install requests pydantic
+```sh
+pip install headwater-api
 ```
 
-**2. Run a Query**
-
-The following example connects to the client and uses the `curate` endpoint to retrieve relevant items for a given query. Save this as `example.py`.
+**2. Run a query**
 
 ```python
-from headwater_api.client import HeadwaterClient
-from headwater_api.classes import CuratorRequest
+from headwater_api.client.headwater_client import HeadwaterClient
+from headwater_api.classes import ConduitRequest
+from conduit.message.textmessage import TextMessage
 
-# Replace with the actual URL of your Headwater API server
-HEADWATER_API_URL = "http://localhost:8080"
+# Initialize the client
+client = HeadwaterClient()
 
-def get_top_search_results():
-    """
-    Initializes the client and retrieves curated search results.
-    """
-    try:
-        # 1. Initialize the client
-        client = HeadwaterClient(base_url=HEADWATER_API_URL)
+# Construct the request for a specific model
+request = ConduitRequest(
+    messages=[TextMessage(role="user", content="Name three species of birds native to North America.")],
+    model="gpt-oss:latest"
+)
 
-        # 2. Create a request object
-        request = CuratorRequest(
-            query_string="What are the latest developments in machine learning?",
-            k=3  # Request the top 3 results
-        )
+# Execute the synchronous query
+response = client.conduit.query_sync(request)
 
-        # 3. Call the API method
-        response = client.curate(request)
-
-        # 4. Process the response
-        print("Curation successful. Top results:")
-        for result in response.results:
-            print(f"- ID: {result.id}, Score: {result.score:.4f}")
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-if __name__ == "__main__":
-    get_top_search_results()
+# Print the response content
+if hasattr(response, 'content'):
+    print(str(response.content))
+else:
+    print(f"Received an error: {response}")
 ```
 
-Run the script from your terminal:
+## Features
 
-```bash
-python example.py
-```
-
-Expected output:
-
-```
-Curation successful. Top results:
-- ID: doc_789, Score: 0.9123
-- ID: doc_123, Score: 0.8876
-- ID: doc_456, Score: 0.8543
-```
-
-## Core Features Example
-
-This example demonstrates a more complex workflow:
-1.  **Check Server Status**: Ensure the API is healthy.
-2.  **Generate Embeddings**: Create vector embeddings for a batch of documents.
-3.  **Run Batch Inference**: Use the `conduit` service to process multiple prompts asynchronously.
+The client provides a unified interface for three core services: **Conduit** (LLMs), **Embeddings**, and **Curator** (Retrieval). The following example demonstrates the primary function of each.
 
 ```python
-import os
-from headwater_api.client import HeadwaterClient
-from headwater_api.classes import EmbeddingsRequest, BatchRequest
+from headwater_api.client.headwater_client import HeadwaterClient
+from headwater_api.classes import (
+    BatchRequest,
+    EmbeddingsRequest,
+    ChromaBatch,
+    CuratorRequest,
+)
 
-# Assumes ChromaBatch is available from a shared library
-# For demonstration, we'll use a mock class.
-class MockChromaBatch:
-    def __init__(self, documents, ids):
-        self.documents = documents
-        self.ids = ids
-    def model_dump(self):
-        return {"documents": self.documents, "ids": self.ids}
+# 1. Initialize the client
+client = HeadwaterClient()
 
-# Replace with the actual URL of your Headwater API server
-HEADWATER_API_URL = os.getenv("HEADWATER_API_URL", "http://localhost:8080")
+# 2. Perform a batch LLM query using Conduit for high throughput
+print("--- Running Batch Conduit Query ---")
+batch_request = BatchRequest(
+    model="gpt-oss:latest",
+    prompt_strings=[
+        "What is the capital of France?",
+        "Explain the theory of relativity in one sentence.",
+    ],
+)
+batch_response = client.conduit.query_async(batch_request)
+for i, result in enumerate(batch_response.results):
+    print(f"Prompt {i+1}: {str(result.content)}")
 
-def run_full_workflow():
-    """
-    Demonstrates checking status, generating embeddings, and batch processing.
-    """
-    client = HeadwaterClient(base_url=HEADWATER_API_URL)
+# 3. Generate text embeddings
+print("\n--- Generating Embeddings ---")
+embeddings_request = EmbeddingsRequest(
+    model="sentence-transformers/all-mpnet-base-v2",
+    batch=ChromaBatch(
+        ids=["doc1", "doc2"],
+        documents=[
+            "The sky is blue.",
+            "Photosynthesis converts light energy into chemical energy."
+        ]
+    )
+)
+embeddings_response = client.embeddings.generate_embeddings(embeddings_request)
+print(f"Generated {len(embeddings_response.embeddings)} embeddings.")
 
-    try:
-        # 1. Check server status
-        status = client.get_status()
-        print(f"Server status: {status['status']}")
-        if status['status'] != 'healthy':
-            print("Server is not healthy. Aborting.")
-            return
-
-        # 2. Generate embeddings for a batch of text
-        print("\n--- Generating Embeddings ---")
-        docs_to_embed = ["The first document.", "The second document."]
-        embedding_req = EmbeddingsRequest(
-            model="bge",
-            batch=MockChromaBatch(documents=docs_to_embed, ids=["doc1", "doc2"])
-        )
-        embedding_res = client.generate_embeddings(embedding_req)
-        print(f"Generated {len(embedding_res.embeddings)} embeddings.")
-        print(f"Dimension of first embedding: {len(embedding_res.embeddings[0])}")
-
-        # 3. Process multiple prompts in a single async call
-        print("\n--- Running Batch Inference ---")
-        batch_req = BatchRequest(
-            model="claude-3-haiku",
-            prompt_str="Summarize the following text: {text}",
-            input_variables_list=[
-                {"text": "Photosynthesis is a process used by plants."},
-                {"text": "The mitochondria is the powerhouse of the cell."}
-            ]
-        )
-        batch_res = client.query_async(batch_req)
-        print("Received responses for batch request:")
-        for i, res in enumerate(batch_res):
-            # Assuming ConduitResponse has a 'text' attribute
-            # The actual attribute may vary based on the 'conduit' library
-            print(f"  Response {i+1}: {res.text[:50]}...")
-
-    except Exception as e:
-        print(f"An error occurred during the workflow: {e}")
-
-if __name__ == "__main__":
-    run_full_workflow()
+# 4. Curate and rank content with a query
+print("\n--- Curating Content ---")
+curator_request = CuratorRequest(
+    query_string="workplace policy",
+    k=3  # Retrieve top 3 results
+)
+curator_response = client.curator.curate(curator_request)
+print(f"Found {len(curator_response.results)} curated results:")
+for result in curator_response.results:
+    print(f"  - ID: {result.id}, Score: {result.score:.4f}")
 ```
 
-## Installation and Setup
+## Installation
 
-### Prerequisites
-*   Python 3.8+
-*   Access to a running Headwater API server.
+Ensure you have Python 3.8+ installed.
 
-### Installation
-The client depends on external packages that can be installed via pip:
-```bash
-pip install requests pydantic
+```sh
+pip install headwater-api
 ```
-Internal dependencies such as `conduit`, `siphon`, and `dbclients` must be available in your Python environment.
 
-### Client Initialization
-To use the client, import and instantiate `HeadwaterClient`. The constructor requires the base URL of the Headwater API server.
+The client is configured to automatically connect to the Headwater Server via network discovery. No additional configuration is required for standard environments.
+
+## API Usage
+
+The `HeadwaterClient` is the main entry point and provides access to all services through its attributes.
 
 ```python
-from headwater_api.client import HeadwaterClient
+from headwater_api.client.headwater_client import HeadwaterClient
 
-# Recommended: Use an environment variable for the URL
-api_url = os.getenv("HEADWATER_API_URL", "http://localhost:8080")
-
-client = HeadwaterClient(base_url=api_url)
+client = HeadwaterClient()
 ```
 
-## API Overview
+### Conduit: LLM Queries
 
-The client provides methods to interact with the three core services of the Headwater API.
+The `client.conduit` service handles interactions with large language models.
 
-| Service   | Client Methods                         | Purpose                                      |
-|-----------|----------------------------------------|----------------------------------------------|
-| **Curator** | `curate()`                             | Information retrieval and result curation.   |
-| **Conduit** | `query_sync()`, `query_async()`, `generate_embeddings()` | Synchronous and asynchronous model inference. |
-| **Siphon**  | `generate_synthetic_data()`            | Generation of complex synthetic datasets.    |
-
-### Basic Usage
-
-#### Curator: Information Retrieval
-Use `curate` to perform a search or retrieval task.
+#### Synchronous Queries
+For single, blocking requests.
 
 ```python
-from headwater_api.classes import CuratorRequest
+from headwater_api.classes import ConduitRequest
+from conduit.message.textmessage import TextMessage
 
-request = CuratorRequest(query_string="Benefits of unit testing")
-response = client.curate(request)
-# response is a CuratorResponse object with a list of results
+request = ConduitRequest(
+    messages=[TextMessage(role="user", content="Name three birds")],
+    model="gpt-oss:latest"
+)
+response = client.conduit.query_sync(request)
+print(response.content)
 ```
 
-#### Conduit: Batch Inference
-Use `query_async` for efficient, parallel processing of multiple prompts.
+#### Asynchronous Batch Queries
+For processing multiple prompts in a single API call. This is the recommended method for high-throughput tasks. A `BatchRequest` accepts either a list of pre-formatted prompts or a template string with a list of variables.
 
 ```python
 from headwater_api.classes import BatchRequest
 
-request = BatchRequest(
-    model="gpt-4-turbo",
+# Option 1: Using a list of prompt strings
+batch_request_prompts = BatchRequest(
+    model="gpt-oss:latest",
     prompt_strings=[
-        "What is the capital of France?",
-        "Translate 'hello' to Spanish."
-    ]
+        "What is the capital of Canada?",
+        "Describe the water cycle.",
+    ],
 )
-responses = client.query_async(request)
-# responses is a list of ConduitResponse or ConduitError objects
+response = client.conduit.query_async(batch_request_prompts)
+
+# Option 2: Using a template and input variables
+batch_request_vars = BatchRequest(
+    model="gpt-oss:latest",
+    prompt_str="Name 3 famous {things}.",
+    input_variables_list=[
+        {"things": "scientists"},
+        {"things": "artists"},
+    ],
+)
+response = client.conduit.query_async(batch_request_vars)
 ```
 
-#### Error Handling
-API errors are raised as a `HeadwaterServerException`. This exception contains a `server_error` attribute, which is a `HeadwaterServerError` Pydantic model providing detailed information about the failure, including `error_type`, `message`, and `status_code`.
+| Parameter              | Type                     | Description                                                                 |
+| ---------------------- | ------------------------ | --------------------------------------------------------------------------- |
+| `model`                | `str`                    | The model identifier to use for the batch job.                              |
+| `prompt_strings`       | `list[str]`              | A list of complete prompt strings. Use this OR `input_variables_list`.      |
+| `prompt_str`           | `str`                    | A template string with placeholders (e.g., `{topic}`). Required if using `input_variables_list`. |
+| `input_variables_list` | `list[dict[str, str]]`   | A list of dictionaries to format into the `prompt_str`.                     |
+
+
+### Embeddings: Text Embeddings
+
+The `client.embeddings` service generates vector representations of text.
 
 ```python
-from headwater_api.classes import HeadwaterServerException
+from headwater_api.classes import EmbeddingsRequest, ChromaBatch
 
-try:
-    # Make a request that might fail
-    client.curate(CuratorRequest(query_string=""))
-except HeadwaterServerException as e:
-    print(f"API Error: {e.server_error.error_type}")
-    print(f"Message: {e.server_error.message}")
-    if e.server_error.validation_errors:
-        print("Details:", e.server_error.validation_errors)
+request = EmbeddingsRequest(
+    model="sentence-transformers/all-mpnet-base-v2",
+    batch=ChromaBatch(
+        ids=["doc_a", "doc_b"],
+        documents=[
+            "This is the first document.",
+            "This is the second document."
+        ]
+    )
+)
+
+response = client.embeddings.generate_embeddings(request)
+# response.embeddings contains a list of float lists
+print(f"Generated {len(response.embeddings)} embeddings.")
 ```
+
+### Curator: Content Retrieval
+
+The `client.curator` service retrieves and ranks relevant items based on a query string.
+
+```python
+from headwater_api.classes import CuratorRequest
+
+request = CuratorRequest(
+    query_string="sexual harassment in the workplace",
+    k=5, # Return the top 5 results
+)
+
+response = client.curator.curate(request)
+for result in response.results:
+    print(f"ID: {result.id}, Score: {result.score}")
+```
+
