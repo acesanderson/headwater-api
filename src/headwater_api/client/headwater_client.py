@@ -13,6 +13,7 @@ curated_courses = client.curator.curate(request)
 from headwater_api.api.conduit_api import ConduitAPI
 from headwater_api.api.curator_api import CuratorAPI
 from headwater_api.api.embeddings_api import EmbeddingsAPI
+from headwater_api.api.siphon_api import SiphonAPI
 from headwater_api.transport.headwater_transport import HeadwaterTransport
 from headwater_api.classes import StatusResponse
 
@@ -23,6 +24,7 @@ class HeadwaterClient:
         self.conduit = ConduitAPI(self._transport)
         self.curator = CuratorAPI(self._transport)
         self.embeddings = EmbeddingsAPI(self._transport)
+        self.siphon = SiphonAPI(self._transport)
 
     def ping(self) -> bool:
         """Ping the Headwater service to check connectivity."""

@@ -1,7 +1,5 @@
 """
 Client for interacting with the Curator service.
-CuratorAPI is defined, as a mixin.
-We define CuratorClient at the bottom of the file, combining CuratorAPI with HeadwaterTransport.
 """
 
 from headwater_api.api.base_api import BaseAPI

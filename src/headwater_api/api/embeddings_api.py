@@ -1,7 +1,5 @@
 """
 Client for interacting with the Curator service.
-EmbeddingsAPI is defined, as a mixin for HeadwaterTransport.
-We define EmbeddingsClient at the bottom of the file, combining EmbeddingsAPI with HeadwaterTransport.
 """
 
 from headwater_api.api.base_api import BaseAPI

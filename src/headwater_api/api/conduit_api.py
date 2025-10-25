@@ -1,7 +1,5 @@
 """
 Client for interacting with the Conduit service.
-ConduitAPI is defined, as a mixin.
-We define ConduitClient at the bottom of the file, combining API with HeadwaterTransport.
 """
 
 from headwater_api.api.base_api import BaseAPI
