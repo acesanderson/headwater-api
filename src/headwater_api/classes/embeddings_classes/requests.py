@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, model_validator
 from typing import Any
 
 
+# Embeddings
 class ChromaBatch(BaseModel):
     # Mandatory fields
     ids: list[str] = Field(
@@ -41,7 +42,8 @@ class QuickEmbeddingRequest(BaseModel):
     )
 
 
-class CreateCollection(BaseModel):
+# Collection Operations
+class CreateCollectionRequest(BaseModel):
     name: str = Field(
         ...,
         description="The name of the collection to create.",
@@ -56,14 +58,14 @@ class CreateCollection(BaseModel):
     )
 
 
-class DeleteCollection(BaseModel):
+class DeleteCollectionRequest(BaseModel):
     name: str = Field(
         ...,
         description="The name of the collection to delete.",
     )
 
 
-class InsertCollection(BaseModel):
+class InsertCollectionRequest(BaseModel):
     name: str = Field(
         ...,
         description="The name of the collection to insert into.",
@@ -78,10 +80,10 @@ class InsertCollection(BaseModel):
     )
 
 
-class ListCollections(BaseModel): ...
+class ListCollectionsRequest(BaseModel): ...
 
 
-class QueryCollection(BaseModel):
+class QueryCollectionRequest(BaseModel):
     # Mandatory fields
     name: str = Field(
         ...,
@@ -119,9 +121,9 @@ __all__ = [
     "ChromaBatch",
     "EmbeddingsRequest",
     "QuickEmbeddingRequest",
-    "CreateCollection",
-    "DeleteCollection",
-    "InsertCollection",
-    "ListCollections",
-    "QueryCollection",
+    "CreateCollectionRequest",
+    "DeleteCollectionRequest",
+    "InsertCollectionRequest",
+    "ListCollectionsRequest",
+    "QueryCollectionRequest",
 ]

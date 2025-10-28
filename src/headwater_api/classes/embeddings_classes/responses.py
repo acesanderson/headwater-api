@@ -28,7 +28,7 @@ class CollectionRecord(BaseModel):
     )
 
 
-class CreatedCollection(BaseModel):
+class CreateCollectionResponse(BaseModel):
     collection: CollectionRecord = Field(
         ..., description="Details of the created collection"
     )
@@ -37,7 +37,7 @@ class CreatedCollection(BaseModel):
     )
 
 
-class DeletedCollection(BaseModel):
+class DeleteCollectionResponse(BaseModel):
     collection: CollectionRecord = Field(
         ..., description="Details of the deleted collection"
     )
@@ -46,7 +46,7 @@ class DeletedCollection(BaseModel):
     )
 
 
-class InsertedCollection(BaseModel):
+class InsertCollectionResponse(BaseModel):
     collection: CollectionRecord = Field(..., description="Details of the collection")
     result: Literal["collection_not_found", "inserted"] = Field(
         ..., description="Result of the insert operation"
@@ -54,13 +54,13 @@ class InsertedCollection(BaseModel):
     inserted_count: int = Field(..., description="Number of documents inserted")
 
 
-class ListedCollections(BaseModel):
+class ListCollectionsResponse(BaseModel):
     collections: list[CollectionRecord] = Field(
         ..., description="List of collection names"
     )
 
 
-class QueryResponse(BaseModel):
+class QueryCollectionResponse(BaseModel):
     query: str = Field(..., description="The query string used for searching")
     ids: list[str] = Field(..., description="List of matching document IDs")
     documents: list[str] = Field(..., description="List of matching documents")
@@ -71,9 +71,9 @@ __all__ = [
     "EmbeddingsResponse",
     "QuickEmbeddingResponse",
     "CollectionRecord",
-    "CreatedCollection",
-    "DeletedCollection",
-    "InsertedCollection",
-    "ListedCollections",
-    "QueryResponse",
+    "CreateCollectionResponse",
+    "DeleteCollectionResponse",
+    "InsertCollectionResponse",
+    "ListCollectionResponse",
+    "QueryCollectionResponse",
 ]
