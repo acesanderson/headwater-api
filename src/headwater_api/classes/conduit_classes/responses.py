@@ -12,13 +12,8 @@ class BatchResponse(BaseModel):
     )
 
 
-# Embeddings
-class EmbeddingsResponse(BaseModel):
-    """Response model for embeddings generation"""
-
-    embeddings: list[list[float]] = Field(
-        ..., description="List of generated embeddings"
-    )
-
-
-__all__ = ["EmbeddingsResponse", "ConduitResponse", "ConduitError"]
+__all__ = [
+    "BatchResponse",
+    "ConduitResponse",
+    "ConduitError",
+]

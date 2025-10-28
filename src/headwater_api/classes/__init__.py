@@ -2,8 +2,16 @@
 from headwater_api.classes.conduit_classes.requests import (
     ConduitRequest,
     BatchRequest,
-    EmbeddingsRequest,
+)
+from headwater_api.classes.embeddings_classes.requests import (
     ChromaBatch,
+    EmbeddingsRequest,
+    QuickEmbeddingRequest,
+    CreateCollection,
+    DeleteCollection,
+    InsertCollection,
+    ListCollections,
+    QueryCollection,
 )
 from headwater_api.classes.siphon_classes.requests import (
     SyntheticDataRequest,
@@ -17,8 +25,18 @@ from headwater_api.classes.conduit_classes.responses import (
     ConduitResponse,
     BatchResponse,
     ConduitError,
-    EmbeddingsResponse,
 )
+from headwater_api.classes.embeddings_classes.responses import (
+    EmbeddingsResponse,
+    QuickEmbeddingResponse,
+    CollectionRecord,
+    CreatedCollection,
+    DeletedCollection,
+    InsertedCollection,
+    ListedCollections,
+    QueryResponse,
+)
+
 from headwater_api.classes.curator_classes.responses import (
     CuratorResponse,
     CuratorResult,
@@ -42,18 +60,31 @@ __all__ = [
     # Requests
     "ConduitRequest",
     "BatchRequest",
-    "ChromaBatch",
-    "EmbeddingsRequest",
     "SyntheticDataRequest",
     "CuratorRequest",
+    "ChromaBatch",
+    "EmbeddingsRequest",
+    "CollectionRecord",
+    "CreateCollection",
+    "DeleteCollection",
+    "InsertCollection",
+    "ListCollections",
+    "QueryCollection",
+    "QuickEmbeddingRequest",
     # Responses
     "ConduitResponse",
     "BatchResponse",
     "ConduitError",
-    "EmbeddingsResponse",
     "SyntheticData",
     "CuratorResponse",
     "CuratorResult",
+    "EmbeddingsResponse",
+    "QuickEmbeddingResponse",
+    "CreatedCollection",
+    "DeletedCollection",
+    "InsertedCollection",
+    "ListedCollections",
+    "QueryResponse",
     # Server
     "HeadwaterServerError",
     "HeadwaterServerException",

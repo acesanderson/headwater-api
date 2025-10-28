@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field, model_validator
+from pydantic import Field, model_validator
 from conduit.request.request import Request as ConduitRequest
-from typing import Any, override
+from typing import override
 
 
 class BatchRequest(ConduitRequest):
@@ -65,32 +65,7 @@ class BatchRequest(ConduitRequest):
         return self
 
 
-class ChromaBatch(BaseModel):
-    # Mandatory fields
-    ids: list[str] = Field(
-        ..., description="List of unique identifiers for each item in the batch."
-    )
-    documents: list[str] = Field(
-        ..., description="List of documents or text associated with each item."
-    )
-    # Optional fields
-    embeddings: list[list[float]] | None = Field(
-        default=None, description="List of embeddings corresponding to each item."
-    )
-    metadatas: list[dict[str, Any]] | None = Field(
-        default=None, description="List of metadata dictionaries for each item."
-    )
-
-
-class EmbeddingsRequest(BaseModel):
-    model: str = Field(
-        ...,
-        description="The embedding model to use for generating embeddings.",
-    )
-    batch: ChromaBatch = Field(
-        ...,
-        description="Batch of documents to generate embeddings for.",
-    )
-
-
-__all__ = ["ConduitRequest", "BatchRequest", "ChromaBatch", "EmbeddingsRequest"]
+__all__ = [
+    "ConduitRequest",
+    "BatchRequest",
+]
