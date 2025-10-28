@@ -35,6 +35,9 @@ from headwater_api.classes.server_classes.exceptions import (
 )
 from headwater_api.classes.server_classes.status import StatusResponse, PingResponse
 
+# Configs
+from headwater_api.classes.siphon_classes.embedding_models import EmbeddingModels
+
 __all__ = [
     # Requests
     "ConduitRequest",
@@ -57,4 +60,6 @@ __all__ = [
     "ErrorType",
     "StatusResponse",
     "PingResponse",
+    # Configs
+    "EmbeddingModels",
 ]
